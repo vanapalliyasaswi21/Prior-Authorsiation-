@@ -19,7 +19,8 @@ SYSTEM_DB_CONFIG = {
     "password": DB_PASSWORD,
     "database": PA_SYSTEM_DB,
     "charset": "utf8mb4",
-    "autocommit": True
+    "autocommit": True,
+    "ssl": {}
 }
 
 KB_DB_CONFIG = {
@@ -29,7 +30,8 @@ KB_DB_CONFIG = {
     "password": DB_PASSWORD,
     "database": PA_KB_DB,
     "charset": "utf8mb4",
-    "autocommit": True
+    "autocommit": True,
+    "ssl": {}
 }
 
 def get_system_db():
