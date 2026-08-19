@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 name: Build and deploy Python app to Azure Web App - priorAurthazotion-backend
 on:
   push:
@@ -8,7 +11,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read  # Required for actions/checkout
+    defaults:
+      run:
+        working-directory: backend  # All commands run inside /backend
     steps:
       - uses: actions/checkout@v4
 
@@ -17,34 +23,46 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Copy backend files to root
-        run: cp -r backend/* .
-
-      - name: Install dependencies
+      # This local venv is only here to fail the build fast if a dependency
+      # doesn't install cleanly. It is NOT shipped in the deployment artifact
+      # (see the exclude below) — Azure's Oryx build step installs the real
+      # runtime dependencies during deployment. Make sure
+      # SCM_DO_BUILD_DURING_DEPLOYMENT=true is set on the Web App in
+      # Configuration > Application settings, or Oryx will skip the build
+      # and the site will crash with "No module named uvicorn".
+      - name: Create and start virtual environment, install dependencies
         run: |
           python -m venv antenv
           source antenv/bin/activate
           pip install -r requirements.txt
 
+      # NOTE: path: backend uploads the *backend* directory itself as the
+      # top level of the artifact — it does NOT flatten backend's contents
+      # to the artifact root. actions/upload-artifact preserves the folder
+      # name. So on Azure, the deployed files live at:
+      #   /home/site/wwwroot/backend/app.py
+      #   /home/site/wwwroot/backend/requirements.txt
+      # etc. The App Service Startup Command must reference the module as
+      # "backend.app:app", NOT "app:app".
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
-          name: python-app-backend
+          name: python-app
           path: |
-            .
-            !antenv/
+            backend
+            !backend/antenv/
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write  # Required for requesting the JWT
+      contents: read   # Required for actions/checkout
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: python-app-backend
+          name: python-app
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -59,3 +77,13 @@ jobs:
         with:
           app-name: 'priorAurthazotion-backend'
           slot-name: 'Production'
+
+      # Deployment does not change Web App Configuration settings.
+      # After this job succeeds, in the Azure Portal confirm:
+      #   1. Configuration > General settings > Startup Command:
+      #        python -m uvicorn backend.app:app --host 0.0.0.0 --port 8000
+      #   2. Configuration > Application settings:
+      #        SCM_DO_BUILD_DURING_DEPLOYMENT = true
+      # Both are one-time settings; they don't need to be in this workflow,
+      # but a deploy will keep failing without them regardless of what
+      # this file does.
