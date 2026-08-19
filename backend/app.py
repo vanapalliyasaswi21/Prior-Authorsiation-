@@ -14,7 +14,7 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 
-frontend_origin = os.getenv("FRONTEND_ORIGIN", "https://prioraurthazotion-bvhfd2c6a2f2fnht.centralindia-01.azurewebsites.net")
+frontend_origin = os.getenv("FRONTEND_ORIGIN", "https://nice-stone-04fdf2300.7.azurestaticapps.net")
 
 app.add_middleware(
     CORSMiddleware,
