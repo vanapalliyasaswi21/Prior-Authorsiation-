@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_API_BASE_URL || import.meta.env.REACT_APP_API_URL)) ||
-  (typeof process !== 'undefined' && process.env && (process.env.VITE_API_BASE_URL || process.env.REACT_APP_API_URL)) ||
-  'prioraurthazotion-bvhfd2c6a2f2fnht.centralindia-01.azurewebsites.net';
+const API_BASE_URL =
+  (typeof import.meta !== 'undefined' &&
+    import.meta.env &&
+    import.meta.env.VITE_API_BASE_URL) ||
+  'https://prior-authorsiation-0.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
