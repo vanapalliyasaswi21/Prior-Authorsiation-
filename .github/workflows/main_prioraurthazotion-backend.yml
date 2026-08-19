@@ -60,5 +60,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'prioraurthazotion-backend-ezb9h5h8e2c4hkad'
+          app-name: 'priorAurthazotion-backend'
           slot-name: 'Production'
