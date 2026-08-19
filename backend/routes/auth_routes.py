@@ -61,8 +61,8 @@ def login(req: LoginRequest, request: Request, response: Response):
                 key="token",
                 value=token,
                 httponly=True,
-                samesite="lax",
-                secure=False,  # set True in prod HTTPS
+                samesite="none",
+                secure=True,  # set True in prod HTTPS
                 max_age=28800
             )
             return {
