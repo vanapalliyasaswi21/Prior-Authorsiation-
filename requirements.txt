@@ -15,4 +15,7 @@ Pillow>=10.0.0
 python-multipart>=0.0.9
 pandas
 joblib
-
+python-jose
+scikit-learn
+passlib
+numpy
